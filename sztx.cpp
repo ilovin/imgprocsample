@@ -16,14 +16,22 @@ int w_pic = int(1920 /6), h_pic = int(1080 / 6);
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	Mat src = imread(argv[1]);
+	Mat src;
+	if (argc>1)
+	{
+		src = imread(argv[1]);
+	}
+	else
+	{
+		src = imread("template.jpg");
+	}
 	if (src.empty())
 	{
 		cout << "cannot read the file" << endl;
 		return -1;
 	}
-	resize(src, src, Size(w_pic, h_pic));
 	imwrite("dst.bmp", src);
+	resize(src, src, Size(w_pic, h_pic));
 	//cout << src.size() << endl;
 	//imshow("src", src);
 	Mat gray,binary,rgb[3],hsv;
@@ -37,13 +45,13 @@ int _tmain(int argc, _TCHAR* argv[])
 	equalizeHist(gray, eqh);
 
 	//paint the pic
-	drawtheblock(src, dst, Point(0, 0), "org");
-	drawtheblock(gray, dst, Point(w_pic, 0), "gray");
+	drawtheblock(src, dst, Point(w_pic, 0), "org");
+	drawtheblock(gray, dst, Point(w_pic, h_pic), "gray");
 	drawtheblock(binary, dst, Point(w_pic * 2, 0), "binary");
-	drawtheblock(rgb[2], dst, Point(0, h_pic), "r");
-	drawtheblock(rgb[1], dst, Point(w_pic, h_pic), "g");
-	drawtheblock(rgb[0], dst, Point(w_pic * 2, h_pic), "b");
-	drawtheblock(eqh, dst, Point(0, h_pic * 2), "equalizehist");
+	drawtheblock(rgb[2], dst, Point(0, 0), "r");
+	drawtheblock(rgb[1], dst, Point(0, h_pic), "g");
+	drawtheblock(rgb[0], dst, Point(0, h_pic*2), "b");
+	drawtheblock(eqh, dst, Point(w_pic*2, h_pic), "equalizehist");
 	drawtheblock(histgram(gray), dst, Point(w_pic, h_pic*2), "before");
 	drawtheblock(histgram(eqh), dst, Point(w_pic * 2, h_pic * 2), "after");
 
