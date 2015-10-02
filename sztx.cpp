@@ -1,4 +1,7 @@
 // sztx.cpp : 定义控制台应用程序的入口点。
+// 入口：输入一个图片的str
+// 出口：在本目录下生成一个bmp图片，将图片split成rgb，并且分别均衡化后在合成一幅图片
+// 二值化，以及绘制出灰度图，还有均衡化过的直方图
 //
 
 #include "stdafx.h"
@@ -16,22 +19,27 @@ Mat equalize3c(Mat &src);
 
 int w_pic = int(1920 /6), h_pic = int(1080 / 6);
 
-int _tmain(int argc, _TCHAR* argv[])
+int sztx(string str)
 {
 	Mat src;
-	if (argc>1)
-	{
-		src = imread(argv[1]);
-	}
-	else
-	{
-		src = imread("template.jpg");
-	}
+	src = imread(str);
 	if (src.empty())
 	{
-		cout << "cannot read the file" << endl;
 		return -1;
 	}
+	//if (argc>1)
+	//{
+	//	src = imread(argv[1]);
+	//}
+	//else
+	//{
+	//	src = imread("template.jpg");
+	//}
+	//if (src.empty())
+	//{
+	//	cout << "cannot read the file" << endl;
+	//	return -1;
+	//}
 	imwrite("dst.bmp", src);
 	resize(src, src, Size(w_pic, h_pic));
 	//cout << src.size() << endl;
