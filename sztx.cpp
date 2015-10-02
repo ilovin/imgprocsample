@@ -11,6 +11,8 @@ void rgb2cmyk(Mat &src, vector<Mat> &cmyk);
 void rgb2cmyk2(Mat &src, Mat &cmyk);
 void drawtheblock(Mat &src,Mat &dst, Point anchor, String str);
 Mat histgram(Mat &src);
+Mat histgram3c(Mat &src);
+Mat equalize3c(Mat &src);
 
 int w_pic = int(1920 /6), h_pic = int(1080 / 6);
 
@@ -39,11 +41,15 @@ int _tmain(int argc, _TCHAR* argv[])
 	cvtColor(src, hsv, CV_BGR2HSV);
 	threshold(gray, binary,0, 255,THRESH_BINARY|THRESH_OTSU);
 	split(src, rgb);
-	Mat dst(h_pic * 3, w_pic * 3,CV_8UC3);
+	Mat dst(h_pic * 3, w_pic * 4,CV_8UC3);
 	Mat cmyk;
 	Mat eqh;
+	Mat equa3c;
+	equa3c = equalize3c(src);
 	equalizeHist(gray, eqh);
 
+	//histgram3c(src);
+	waitKey(0);
 	//paint the pic
 	drawtheblock(src, dst, Point(w_pic, 0), "org");
 	drawtheblock(gray, dst, Point(w_pic, h_pic), "gray");
@@ -54,6 +60,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	drawtheblock(eqh, dst, Point(w_pic*2, h_pic), "equalizehist");
 	drawtheblock(histgram(gray), dst, Point(w_pic, h_pic*2), "before");
 	drawtheblock(histgram(eqh), dst, Point(w_pic * 2, h_pic * 2), "after");
+	drawtheblock(equa3c, dst, Point(w_pic * 3, 0), "equalize3c");
 
 	//imwrite("dst.png", dst);
 	//Mat tmp = imread("dst.png");
@@ -176,5 +183,88 @@ Mat histgram(Mat &src)
 	}
 	//calcHist(&src)
 	//calcHist(&src, 1, channels, Mat(), hist, 1, histSize, &histRange, uniform, accumulate);
+	return dst;
+}
+
+Mat histgram3c(Mat &src)
+{
+	Mat dst(src.rows, src.cols, CV_8UC3);
+	vector<Mat>bgr_planes;
+	split(src, bgr_planes);
+	int histSize = 256;
+	//int histSize = 256;
+	float range[] = { 0, 256 };
+	const float* histRange = { range };
+	bool uniform = true; bool accumulate = false;
+
+	int channels[] = { 0, 1, 2 };
+
+	Mat b_hist, g_hist, r_hist;
+	calcHist(&bgr_planes[0], 1, 0, Mat(), b_hist, 1, &histSize, &histRange, uniform, accumulate);
+	calcHist(&bgr_planes[1], 1, 0, Mat(), g_hist, 1, &histSize, &histRange, uniform, accumulate);
+	calcHist(&bgr_planes[2], 1, 0, Mat(), r_hist, 1, &histSize, &histRange, uniform, accumulate);
+	//calcHist(&bgr_planes[1],)
+	//calcHist(&src, 1,channels, Mat(), thist, 3, histSize, histRange, uniform, accumulate);
+	int hist_w = 512; int hist_h = 400;
+	int bin_w = cvRound((double)hist_w / histSize);
+
+	Mat histImage(hist_h, hist_w, CV_8UC3, Scalar(0, 0, 0));
+
+	/// Normalize the result to [ 0, histImage.rows ]
+	normalize(b_hist, b_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat());
+	normalize(g_hist, g_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat());
+	normalize(r_hist, r_hist, 0, histImage.rows, NORM_MINMAX, -1, Mat());
+	for (int i = 1; i < histSize; i++)
+	{
+		line(histImage, Point(bin_w*(i - 1), hist_h - cvRound(b_hist.at<float>(i - 1))),
+			Point(bin_w*(i), hist_h - cvRound(b_hist.at<float>(i))),
+			Scalar(255, 0, 0), 2, 8, 0);
+		line(histImage, Point(bin_w*(i - 1), hist_h - cvRound(g_hist.at<float>(i - 1))),
+			Point(bin_w*(i), hist_h - cvRound(g_hist.at<float>(i))),
+			Scalar(0, 255, 0), 2, 8, 0);
+		line(histImage, Point(bin_w*(i - 1), hist_h - cvRound(r_hist.at<float>(i - 1))),
+			Point(bin_w*(i), hist_h - cvRound(r_hist.at<float>(i))),
+			Scalar(0, 0, 255), 2, 8, 0);
+	}
+
+	//for (int i = 1; i < histSize[0]-1; i++)
+	//{
+	//	line(histImage, Point(bin_w*(i - 1), hist_h - cvRound(b_hist.at<float>(i - 1))),
+	//		Point(bin_w*(i), hist_h - cvRound(b_hist.at<float>(i))),
+	//		Scalar(255, 0, 0), 2, 8, 0);
+	//	line(histImage, Point(bin_w*(i - 1), hist_h - cvRound(g_hist.at<float>(i - 1))),
+	//		Point(bin_w*(i), hist_h - cvRound(g_hist.at<float>(i))),
+	//		Scalar(0, 255, 0), 2, 8, 0);
+	//	line(histImage, Point(bin_w*(i - 1), hist_h - cvRound(r_hist.at<float>(i - 1))),
+	//		Point(bin_w*(i), hist_h - cvRound(r_hist.at<float>(i))),
+	//		Scalar(0, 0, 255), 2, 8, 0);
+	//}
+
+	/// Display
+	namedWindow("calcHist Demo", CV_WINDOW_AUTOSIZE);
+	imshow("calcHist Demo", histImage);
+
+	//calcHist(&src)
+	//calcHist(&src, 1, channels, Mat(), hist, 1, histSize, &histRange, uniform, accumulate);
+	return dst;
+}
+
+Mat equalize3c(Mat &src)
+{
+	vector<Mat>bgr_planes;
+	split(src, bgr_planes);
+	Mat b, g, r;
+	vector<Mat>bgr_equa;
+
+	equalizeHist(bgr_planes[0], b);
+	equalizeHist(bgr_planes[1], g);
+	equalizeHist(bgr_planes[2], r);
+	bgr_equa = { b, g, r };
+	//bgr_equa.push_back(b);
+	//bgr_equa.push_back(g);
+	//bgr_equa.push_back(r);
+	Mat dst;
+	merge(bgr_equa, dst);
+	//imshow("equalized", dst);
 	return dst;
 }

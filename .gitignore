@@ -26,3 +26,14 @@
 *.exe
 *.out
 *.app
+
+# others
+*.jpg
+Debug/
+dst.bmp
+stdafx.cpp
+sztx.vcxproj
+sztx.vcxproj.filters
+sztx.vcxproj.user
+targetver.h
+introduction.txt

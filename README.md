@@ -4,6 +4,7 @@
 
 - 直接双击，默认调用文件夹下的`template.jpg	`作为源图像
 - 在cmd中运行，添加一个图片作为源图像如 
+
 	> sztx.exe template2.jpg </br>
 	> sztx.exe d:\tmp\2.jpg
 	
