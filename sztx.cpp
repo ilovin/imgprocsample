@@ -5,20 +5,20 @@
 //
 
 #include "stdafx.h"
+#include "sztx.h"
 
-using namespace std;
-using namespace cv;
+//using namespace std;
+//using namespace cv;
+//
+//void diffcopy(Mat &src, Mat &dst);
+//void rgb2cmyk(Mat &src, vector<Mat> &cmyk);
+//void rgb2cmyk2(Mat &src, Mat &cmyk);
+//void drawtheblock(Mat &src,Mat &dst, Point anchor, String str);
+//Mat histgram(Mat &src);
+//Mat histgram3c(Mat &src);
+//Mat equalize3c(Mat &src);
 
-void diffcopy(Mat &src, Mat &dst);
-void rgb2cmyk(Mat &src, vector<Mat> &cmyk);
-void rgb2cmyk2(Mat &src, Mat &cmyk);
-void drawtheblock(Mat &src,Mat &dst, Point anchor, String str);
-Mat histgram(Mat &src);
-Mat histgram3c(Mat &src);
-Mat equalize3c(Mat &src);
-
-int w_pic = int(1920 /6), h_pic = int(1080 / 6);
-
+static int w_pic = int(1920 / 6), h_pic = int(1080 / 6);
 int sztx(string str)
 {
 	Mat src;
@@ -211,7 +211,17 @@ Mat histgram3c(Mat &src)
 	calcHist(&bgr_planes[0], 1, 0, Mat(), b_hist, 1, &histSize, &histRange, uniform, accumulate);
 	calcHist(&bgr_planes[1], 1, 0, Mat(), g_hist, 1, &histSize, &histRange, uniform, accumulate);
 	calcHist(&bgr_planes[2], 1, 0, Mat(), r_hist, 1, &histSize, &histRange, uniform, accumulate);
-	//calcHist(&bgr_planes[1],)
+	// http://docs.opencv.org/doc/tutorials/imgproc/histograms/histogram_calculation/histogram_calculation.html
+	//  &bgr_planes[0]: The source array(s)
+	//	1 : The number of source arrays(in this case we are using 1. We can enter here also a list of arrays)
+	//	0 : The channel(dim) to be measured.In this case it is just the intensity(each array is single - channel) so we just write 0.
+	//	Mat(): A mask to be used on the source array(zeros indicating pixels to be ignored).If not defined it is not used
+	//b_hist : The Mat object where the histogram will be stored
+	//		 1 : The histogram dimensionality.
+	//	 histSize : The number of bins per each used dimension
+	//			histRange : The range of values to be measured per each dimension
+	//						uniform and accumulate : The bin sizes are the same and the histogram is cleared at the beginning.
+
 	//calcHist(&src, 1,channels, Mat(), thist, 3, histSize, histRange, uniform, accumulate);
 	int hist_w = 512; int hist_h = 400;
 	int bin_w = cvRound((double)hist_w / histSize);

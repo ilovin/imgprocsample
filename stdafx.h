@@ -16,7 +16,7 @@
 #include <opencv2/highgui/highgui.hpp> 
 #include <string>
 
-
+//extern int w_pic, h_pic;//define in sztx.cpp
 
 
 // TODO:  在此处引用程序需要的其他头文件
