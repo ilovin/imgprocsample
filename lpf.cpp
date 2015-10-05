@@ -12,12 +12,14 @@ Mat createIdealfilter(Size size_of_filter, int D);
 Mat createGaussianfilter(Size size_of_filter, double sigma_h, double sigma_v);
 Mat createbutterworthfilter(Size size_of_filter, int D, int order);
 Mat do_filter(Mat &dft_result, Mat filter);
+Mat draw_the_map(Mat r_dft_result, Mat g_dft_result, Mat b_dft_result, Mat filter, 
+	int type,Point anchor=Point(0,0),string str="str");
 
 int w_pic = int(1920 / 6), h_pic = int(1080 / 6);
+Mat dst(h_pic * 3, w_pic * 3, CV_32FC3);
 
 int lpf(string option, string img){
-	Mat src = imread(img,CV_LOAD_IMAGE_GRAYSCALE);
-	Mat dst(h_pic * 3, w_pic * 3, CV_8UC3);
+	Mat src = imread(img);
 	Mat bgr[3];
 
 	if (src.empty())
@@ -32,10 +34,10 @@ int lpf(string option, string img){
 	resize(src, src, Size(w_pic, h_pic));
 	//imshow("src", src);
 	split(src, bgr);
-	drawtheblock(bgr[2], dst, Point(0, 0), "r");
-	//drawtheblock(bgr[1], dst, Point(0, h_pic), "g");
-	//drawtheblock(bgr[0], dst, Point(0, h_pic * 2), "b");
-	imshow("final", dst);
+	drawtheblock(bgr[0], dst, Point(0, 0), "b");
+	drawtheblock(bgr[1], dst, Point(0, h_pic), "g");
+	drawtheblock(bgr[2], dst, Point(0, h_pic * 2), "r");
+	//imshow("final", dst);
 
 	int type = 0;
 	if (strcmp(option.c_str(),"--ideal")==0||strcmp(option.c_str(),"--i")==0)
@@ -50,7 +52,7 @@ int lpf(string option, string img){
 	{
 		type = 2;
 	}
-	else if (option=="--example")
+	else if (option=="--example"||option=="--e")
 	{
 		type = 3;
 	}
@@ -60,11 +62,25 @@ int lpf(string option, string img){
 		return -1;
 	}
 
-	Mat dft_result;
-	DFT(src, dft_result);
-	shiftDFT(dft_result);
-	imshow("show the freq spectrum before filter", show_spectrum_magnitude(dft_result, false));
+	Mat dft_result,r_dft_result,g_dft_result,b_dft_result;
+	DFT(bgr[0], b_dft_result);
+	shiftDFT(b_dft_result);
+	DFT(bgr[1], g_dft_result);
+	shiftDFT(g_dft_result);
+	DFT(bgr[2], r_dft_result);
+	shiftDFT(r_dft_result);
+	if (type!=3)
+	{
+		drawtheblock(show_spectrum_magnitude(r_dft_result, false), dst, Point(w_pic, 0), "r_dft");
+		drawtheblock(src, dst, Point(w_pic*2, 0), "origin");
+		drawtheblock(histgram3c(src,src.size()), dst, Point(w_pic * 2, h_pic*2), "the histgram of src");
+	}
+	else
+	{
+		imshow("src", src);
+	}
 
+	Mat filter;
 	switch (type)
 	{
 	case 0:
@@ -73,8 +89,8 @@ int lpf(string option, string img){
 			"if it is non positive,radius = min(src.rows,src.cols)/4" << endl;
 		int tmp;
 		cin >> tmp;
-		Mat filter = createIdealfilter(dft_result.size(), tmp);
-		imshow("dst", do_filter(dft_result,filter));
+		filter = createIdealfilter(r_dft_result.size(), tmp);
+		draw_the_map(r_dft_result, g_dft_result, b_dft_result, filter,0);
 	}
 	break;
 
@@ -83,11 +99,12 @@ int lpf(string option, string img){
 		cout << "use gaussian filter,please input the sigma for horizontal & vertical" << endl <<
 			"if it is non positive,sigma=0.3*((ksize-1)*0.5 - 1) + 0.8" << endl
 			<< "sigma should be less than min(dft_result.rows,dft_result.cols),which is : "
-			<<min(dft_result.rows,dft_result.cols)<<endl;
+			<<min(src.rows,src.cols)<<endl;
 		double sigma_h,sigma_v;
 		cin >> sigma_h>>sigma_v;
-		Mat filter = createGaussianfilter(dft_result.size(), sigma_h,sigma_v);
-		imshow("dst", do_filter(dft_result, filter));
+		filter = createGaussianfilter(src.size(), sigma_h,sigma_v);
+		draw_the_map(r_dft_result, g_dft_result, b_dft_result, filter,1);
+		//imshow("dst", do_filter(dft_result, filter));
 	}
 	break;
 
@@ -97,17 +114,74 @@ int lpf(string option, string img){
 			<< "D_0 should less than min(src.rows,src.cols),which is :" << min(src.rows, src.cols) << endl;
 		int d_0, order;
 		cin >> d_0>>order;
-		Mat filter = createbutterworthfilter(dft_result.size(), d_0, order);
-		imshow("dst", do_filter(dft_result, filter));
+		filter = createbutterworthfilter(src.size(), d_0, order);
+		draw_the_map(r_dft_result, g_dft_result, b_dft_result, filter,2);
+		//imshow("dst", do_filter(dft_result, filter));
+	}
+	break;
+
+	case 3:
+	{
+		cout << "this is an example of the low pass filter" << endl;
+		Mat r, g, b;
+		r = r_dft_result.clone();
+		g = g_dft_result.clone();
+		b = b_dft_result.clone();
+		filter = createIdealfilter(r_dft_result.size(), 50);
+		draw_the_map(r, g, b, filter, 3, Point(w_pic, 0), "ideal");
+		r = r_dft_result.clone();
+		g = g_dft_result.clone();
+		b = b_dft_result.clone();
+		filter = createGaussianfilter(r_dft_result.size(), 60,60);
+		draw_the_map(r, g, b, filter, 3, Point(w_pic, h_pic), "Gaussian");
+		r = r_dft_result.clone();
+		g = g_dft_result.clone();
+		b = b_dft_result.clone();
+		filter = createbutterworthfilter(src.size(), 60, 3);
+		draw_the_map(r, g, b, filter, 3, Point(w_pic, h_pic * 2), "butterworth");
 	}
 	break;
 	default:
 		break;
 	}
-
+	imshow("dst", dst);
 
 	waitKey(0);
 	return 0;
+}
+
+Mat draw_the_map(Mat r_dft_result, Mat g_dft_result, Mat b_dft_result,Mat filter,
+	int type,Point anchor,string str)
+{
+	Mat r_result, g_result, b_result;
+	Mat final_result;
+
+	r_result = do_filter(r_dft_result, filter);
+	g_result = do_filter(g_dft_result, filter);
+	b_result = do_filter(b_dft_result, filter);
+	//paint
+	if (type!=3)
+	{
+		drawtheblock(show_spectrum_magnitude(r_dft_result, true), dst, Point(w_pic, h_pic), "r_filter after");
+		drawtheblock(r_result, dst, Point(w_pic, h_pic * 2), "r_filter");
+	}
+	else
+	{
+		drawtheblock(show_spectrum_magnitude(r_dft_result, true), dst, anchor,str);
+	}
+
+	Mat planes[3] = { b_result, g_result, r_result };
+	merge(planes, 3, final_result);
+
+	if (type!=3)
+	{
+		drawtheblock(final_result, dst, Point(w_pic * 2, h_pic), "final_filter");
+	}
+	else
+	{
+		drawtheblock(final_result, dst, Point(anchor.x + w_pic, anchor.y), " ");
+	}
+	return final_result;
 }
 
 Mat do_filter(Mat &dft_result, Mat filter)
@@ -138,7 +212,7 @@ Mat createbutterworthfilter(Size size_of_filter, int D, int order)
 		for (int j = 0; j < size_of_filter.width; j++)
 		{
 			radius = sqrt(pow(j - center.x, 2.0) + pow(i - center.y, 2.0));
-			filter.at<float>(i, j) = (float)(1 / 1 + pow(radius/D, 2 * order));
+			filter.at<float>(i, j) = (float)(1 / (1 + pow(radius/D, 2 * order)));
 		}
 	}
 	Mat planes[2] = { filter, filter };
@@ -222,7 +296,10 @@ static void help(void){
 	cout
 		<< "[option][img_path -- default template.jpg]" << endl
 		<< "options : " << endl
-		<< "\t--example --ideal --gaussian --butterworth" << endl;
+		<< "\t--e : an example" << endl
+		<<"\t--i : ideal low pass filter"<<endl
+		<<"\t--g : gaussian LPF"<<endl
+		<<"\t--b : butterworth LPF" << endl;
 }
 
 void shiftDFT(Mat &src)

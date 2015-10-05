@@ -8,5 +8,5 @@ extern void drawtheblock(Mat &src, Mat &dst, Point anchor, String str);
 void rgb2cmyk(Mat &src, vector<Mat> &cmyk);
 void rgb2cmyk2(Mat &src, Mat &cmyk);
 Mat histgram(Mat &src);
-Mat histgram3c(Mat &src);
+extern Mat histgram3c(Mat &src,Size output_size);
 Mat equalize3c(Mat &src);
