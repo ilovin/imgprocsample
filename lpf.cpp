@@ -29,6 +29,8 @@ int lpf(string option, string img){
 	if (option=="--help"||option=="--h")
 	{
 		help();
+		cout << "press any key to continue" << endl;
+		cin.get();
 		return 0;
 	}
 	resize(src, src, Size(w_pic, h_pic));
@@ -71,9 +73,11 @@ int lpf(string option, string img){
 	shiftDFT(r_dft_result);
 	if (type!=3)
 	{
-		drawtheblock(show_spectrum_magnitude(r_dft_result, false), dst, Point(w_pic, 0), "r_dft");
+		drawtheblock(show_spectrum_magnitude(r_dft_result, false), dst, 
+			Point(w_pic, 0), "r_dft");
 		drawtheblock(src, dst, Point(w_pic*2, 0), "origin");
-		drawtheblock(histgram3c(src,src.size()), dst, Point(w_pic * 2, h_pic*2), "the histgram of src");
+		drawtheblock(histgram3c(src,src.size()), dst, 
+			Point(w_pic * 2, h_pic*2), "the histgram of src");
 	}
 	else
 	{
@@ -85,8 +89,10 @@ int lpf(string option, string img){
 	{
 	case 0:
 	{
-		cout << "Use Ideal filter now,please enter the filter radius " << endl<<
-			"if it is non positive,radius = min(src.rows,src.cols)/4" << endl;
+		cout << "Using Ideal filter now,please enter a value <filter radius>"
+		<<"that is less than min(rows,cols)/2 :" 
+		<<min(src.rows,src.cols)/2<< endl
+		<<"if it is non positive,radius = min(src.rows,src.cols)/4" << endl;
 		int tmp;
 		cin >> tmp;
 		filter = createIdealfilter(r_dft_result.size(), tmp);
@@ -96,10 +102,11 @@ int lpf(string option, string img){
 
 	case 1:
 	{
-		cout << "use gaussian filter,please input the sigma for horizontal & vertical" << endl <<
-			"if it is non positive,sigma=0.3*((ksize-1)*0.5 - 1) + 0.8" << endl
-			<< "sigma should be less than min(dft_result.rows,dft_result.cols),which is : "
-			<<min(src.rows,src.cols)<<endl;
+		cout << "Using gaussian filter now,please enter the <sigma>s for"
+		<<"horizontal & vertical" << endl 
+		<<"if it is non positive,sigma=0.3*((ksize-1)*0.5 - 1) + 0.8" << endl
+		<< "sigma should be less than min(dft_result.rows,dft_result.cols),"
+		<<"which is : "<<min(src.rows,src.cols)<<endl;
 		double sigma_h,sigma_v;
 		cin >> sigma_h>>sigma_v;
 		filter = createGaussianfilter(src.size(), sigma_h,sigma_v);
@@ -110,8 +117,10 @@ int lpf(string option, string img){
 
 	case 2:
 	{
-		cout << "use butterworth filter,please input the D_0 & order,the less the stronger" << endl
-			<< "D_0 should less than min(src.rows,src.cols),which is :" << min(src.rows, src.cols) << endl;
+		cout << "Using butterworth filter now,please input the <D_0> & <order>,"
+		"the less,the stronger" << endl
+		<< "D_0 should less than min(src.rows,src.cols),which is :" 
+		<< min(src.rows, src.cols) << endl;
 		int d_0, order;
 		cin >> d_0>>order;
 		filter = createbutterworthfilter(src.size(), d_0, order);
@@ -132,7 +141,7 @@ int lpf(string option, string img){
 		r = r_dft_result.clone();
 		g = g_dft_result.clone();
 		b = b_dft_result.clone();
-		filter = createGaussianfilter(r_dft_result.size(), 60,60);
+		filter = createGaussianfilter(r_dft_result.size(), 50,50);
 		draw_the_map(r, g, b, filter, 3, Point(w_pic, h_pic), "Gaussian");
 		r = r_dft_result.clone();
 		g = g_dft_result.clone();
