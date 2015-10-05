@@ -27,19 +27,6 @@ int sztx(string str)
 	{
 		return -1;
 	}
-	//if (argc>1)
-	//{
-	//	src = imread(argv[1]);
-	//}
-	//else
-	//{
-	//	src = imread("template.jpg");
-	//}
-	//if (src.empty())
-	//{
-	//	cout << "cannot read the file" << endl;
-	//	return -1;
-	//}
 	imwrite("dst.bmp", src);
 	resize(src, src, Size(w_pic, h_pic));
 	//cout << src.size() << endl;
@@ -85,10 +72,38 @@ int sztx(string str)
 void diffcopy(Mat &src, Mat &dst)
 {
 	Mat tmp;
-	if (src.type() != dst.type())
+	if (src.type ()!=dst.type())
 	{
-		cvtColor(src, tmp, CV_GRAY2BGR);
-		tmp.copyTo(dst);
+		if (dst.type()==CV_32FC3)
+		{
+			if (src.type() == CV_8UC3)
+			{
+				src.convertTo(tmp, CV_32FC3);
+				normalize(tmp, tmp, 0, 1, NORM_MINMAX);
+				tmp.copyTo(dst);
+			}
+			else if (src.type() == CV_8UC1)
+			{
+				src.convertTo(tmp, dst.type());
+				normalize(tmp, tmp, 0, 1, NORM_MINMAX);
+				cvtColor(tmp, tmp, CV_GRAY2BGR);
+				tmp.copyTo(dst);
+			}
+			else
+			{
+				cvtColor(src, tmp, CV_GRAY2BGR);
+				tmp.copyTo(dst);
+			}
+		}
+		else if (dst.type() == CV_8UC3)
+		{
+			cvtColor(src, tmp, CV_GRAY2BGR);
+			tmp.copyTo(dst);
+		}
+		else
+		{
+			cout << "invalid type for copy picture" << endl;
+		}
 	}
 	else{
 		src.copyTo(dst);
@@ -194,9 +209,9 @@ Mat histgram(Mat &src)
 	return dst;
 }
 
-Mat histgram3c(Mat &src)
+Mat histgram3c(Mat &src,Size output_size)
 {
-	Mat dst(src.rows, src.cols, CV_8UC3);
+	//Mat dst(src.rows, src.cols, CV_8UC3);
 	vector<Mat>bgr_planes;
 	split(src, bgr_planes);
 	int histSize = 256;
@@ -223,7 +238,9 @@ Mat histgram3c(Mat &src)
 	//						uniform and accumulate : The bin sizes are the same and the histogram is cleared at the beginning.
 
 	//calcHist(&src, 1,channels, Mat(), thist, 3, histSize, histRange, uniform, accumulate);
-	int hist_w = 512; int hist_h = 400;
+	//int hist_w = 512; int hist_h = 400;
+	int hist_w = output_size.width;
+	int hist_h = output_size.height;
 	int bin_w = cvRound((double)hist_w / histSize);
 
 	Mat histImage(hist_h, hist_w, CV_8UC3, Scalar(0, 0, 0));
@@ -259,12 +276,13 @@ Mat histgram3c(Mat &src)
 	//}
 
 	/// Display
-	namedWindow("calcHist Demo", CV_WINDOW_AUTOSIZE);
-	imshow("calcHist Demo", histImage);
+
+	//namedWindow("calcHist Demo", CV_WINDOW_AUTOSIZE);
+	//imshow("calcHist Demo", histImage);
 
 	//calcHist(&src)
 	//calcHist(&src, 1, channels, Mat(), hist, 1, histSize, &histRange, uniform, accumulate);
-	return dst;
+	return histImage;
 }
 
 Mat equalize3c(Mat &src)

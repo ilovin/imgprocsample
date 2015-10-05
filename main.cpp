@@ -13,15 +13,13 @@ int _tmain(int argc, _TCHAR* argv[])
 	if (argc > 2)
 	{
 		img = argv[2];
-		//src = imread(argv[1]);
 	}
 	else
 	{
 		img = "template.jpg";
-		//src = imread("template.jpg");
 	}
 	int tmp = lpf(option,img) ;
-	//int tmp = sztx(str);
+	//int tmp = sztx(option);
 	if (tmp!=0)
 	{
 		cout << tmp << endl;
