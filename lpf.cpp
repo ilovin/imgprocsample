@@ -11,7 +11,7 @@ Mat show_spectrum_magnitude(Mat &complexImg, bool shift = false);
 Mat createIdealfilter(Size size_of_filter, int D);
 Mat createGaussianfilter(Size size_of_filter, double sigma_h, double sigma_v);
 Mat createbutterworthfilter(Size size_of_filter, int D, int order);
-Mat do_filter(Mat &dft_result, Mat filter);
+Mat do_filter(Mat &dft_result, Mat filter,Mat &dft_filter_dst);
 Mat draw_the_map(Mat r_dft_result, Mat g_dft_result, Mat b_dft_result, Mat filter, 
 	int type,Point anchor=Point(0,0),string str="str");
 
@@ -41,6 +41,14 @@ int lpf(string option, string img){
 	drawtheblock(bgr[2], dst, Point(0, h_pic * 2), "r");
 	//imshow("final", dst);
 
+	Mat dft_result,r_dft_result,g_dft_result,b_dft_result;
+	DFT(bgr[0], b_dft_result);
+	shiftDFT(b_dft_result);
+	DFT(bgr[1], g_dft_result);
+	shiftDFT(g_dft_result);
+	DFT(bgr[2], r_dft_result);
+	shiftDFT(r_dft_result);
+
 	int type = 0;
 	if (strcmp(option.c_str(),"--ideal")==0||strcmp(option.c_str(),"--i")==0)
 	{
@@ -64,13 +72,6 @@ int lpf(string option, string img){
 		return -1;
 	}
 
-	Mat dft_result,r_dft_result,g_dft_result,b_dft_result;
-	DFT(bgr[0], b_dft_result);
-	shiftDFT(b_dft_result);
-	DFT(bgr[1], g_dft_result);
-	shiftDFT(g_dft_result);
-	DFT(bgr[2], r_dft_result);
-	shiftDFT(r_dft_result);
 	if (type!=3)
 	{
 		drawtheblock(show_spectrum_magnitude(r_dft_result, false), dst, 
@@ -132,22 +133,15 @@ int lpf(string option, string img){
 	case 3:
 	{
 		cout << "this is an example of the low pass filter" << endl;
-		Mat r, g, b;
-		r = r_dft_result.clone();
-		g = g_dft_result.clone();
-		b = b_dft_result.clone();
+		//ideal
 		filter = createIdealfilter(r_dft_result.size(), 50);
-		draw_the_map(r, g, b, filter, 3, Point(w_pic, 0), "ideal");
-		r = r_dft_result.clone();
-		g = g_dft_result.clone();
-		b = b_dft_result.clone();
+		draw_the_map(r_dft_result, g_dft_result, b_dft_result, filter, 3, Point(w_pic, 0), "ideal");
+		//gaussian
 		filter = createGaussianfilter(r_dft_result.size(), 50,50);
-		draw_the_map(r, g, b, filter, 3, Point(w_pic, h_pic), "Gaussian");
-		r = r_dft_result.clone();
-		g = g_dft_result.clone();
-		b = b_dft_result.clone();
+		draw_the_map(r_dft_result, g_dft_result, b_dft_result, filter, 3, Point(w_pic, h_pic), "Gaussian");
+		//butterworth
 		filter = createbutterworthfilter(src.size(), 60, 3);
-		draw_the_map(r, g, b, filter, 3, Point(w_pic, h_pic * 2), "butterworth");
+		draw_the_map(r_dft_result, g_dft_result, b_dft_result, filter, 3, Point(w_pic, h_pic * 2), "butterworth");
 	}
 	break;
 	default:
@@ -165,18 +159,20 @@ Mat draw_the_map(Mat r_dft_result, Mat g_dft_result, Mat b_dft_result,Mat filter
 	Mat r_result, g_result, b_result;
 	Mat final_result;
 
-	r_result = do_filter(r_dft_result, filter);
-	g_result = do_filter(g_dft_result, filter);
-	b_result = do_filter(b_dft_result, filter);
+	Mat r_dft_filter_dst, g_dft_filter_dst, b_dft_filter_dst;
+	r_result = do_filter(r_dft_result, filter,r_dft_filter_dst);
+	g_result = do_filter(g_dft_result, filter,g_dft_filter_dst);
+	b_result = do_filter(b_dft_result, filter,b_dft_filter_dst);
 	//paint
 	if (type!=3)
 	{
-		drawtheblock(show_spectrum_magnitude(r_dft_result, true), dst, Point(w_pic, h_pic), "r_filter after");
-		drawtheblock(r_result, dst, Point(w_pic, h_pic * 2), "r_filter");
+		drawtheblock(show_spectrum_magnitude(r_dft_filter_dst, true), dst, 
+			Point(w_pic, h_pic), "r_dft_filtered");
+		drawtheblock(r_result, dst, Point(w_pic, h_pic * 2), "r_filtered");
 	}
 	else
 	{
-		drawtheblock(show_spectrum_magnitude(r_dft_result, true), dst, anchor,str);
+		drawtheblock(show_spectrum_magnitude(r_dft_filter_dst, true), dst, anchor,str);
 	}
 
 	Mat planes[3] = { b_result, g_result, r_result };
@@ -184,7 +180,7 @@ Mat draw_the_map(Mat r_dft_result, Mat g_dft_result, Mat b_dft_result,Mat filter
 
 	if (type!=3)
 	{
-		drawtheblock(final_result, dst, Point(w_pic * 2, h_pic), "final_filter");
+		drawtheblock(final_result, dst, Point(w_pic * 2, h_pic), "final_result");
 	}
 	else
 	{
@@ -193,15 +189,15 @@ Mat draw_the_map(Mat r_dft_result, Mat g_dft_result, Mat b_dft_result,Mat filter
 	return final_result;
 }
 
-Mat do_filter(Mat &dft_result, Mat filter)
+Mat do_filter(Mat &dft_result, Mat filter,Mat &dft_filter_dst)
 {
-	mulSpectrums(dft_result, filter, dft_result, DFT_ROWS);
+	mulSpectrums(dft_result, filter, dft_filter_dst, DFT_ROWS);
 
 	Mat dst;
 	//imshow("after filter the dft", show_spectrum_magnitude(dft_result, false));
 
-	shiftDFT(dft_result);//之前交换过，现在交换回来
-	idft(dft_result, dst);
+	shiftDFT(dft_filter_dst);//之前交换过，现在交换回来
+	idft(dft_filter_dst, dst);
 	normalize(dst, dst, 0, 1, CV_MINMAX);
 	//imshow("after filter the dft",show_spectrum_magnitude(dft_result, false));
 	Mat planes[2];
