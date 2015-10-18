@@ -5,9 +5,9 @@ using namespace std;
 using namespace cv;
 
 void border_to_even(Mat& src);
-Mat h_trans(Mat src);
-Mat v_trans(Mat src);
-Mat dwt_one_time(Mat src);
+Mat h_trans(Mat& src);
+Mat v_trans(Mat& src);
+Mat dwt_one_time(Mat& src);
 
 int dwt(string img, int time)
 {
@@ -29,11 +29,15 @@ int dwt(string img, int time)
 	//Mat dst = h_trans(src);
 	//Mat dst = v_trans(src);
 	Mat dst = dwt_one_time(src);
-	//for (int i = 0; i < time-1; i++)
-	//{
-	//	dst = dwt_one_time(dst);
-	//}
-
+	imshow("tmp", src);
+	Mat imgroi = dst(Rect(0, 0, dst.cols / 2, dst.rows / 2));
+	for (int i = 0; i < time-1; i++)
+	{
+		dwt_one_time(imgroi);
+		//imgroi.copyTo(dst);
+		//imgroi = imgroi(Rect(0, 0, imgroi.cols / 2, imgroi.rows / 2));
+		//dwt_one_time(src);
+	}
 	imshow("dst", dst);
 	while (waitKey(30)!=27)
 	{
@@ -50,14 +54,15 @@ void border_to_even(Mat& src)
 		copyMakeBorder(src, src, 0, 0, 0, 1, BORDER_REFLECT_101);
 }
 
-Mat dwt_one_time(Mat src)
+Mat dwt_one_time(Mat& src)
 {
 	Mat dst = v_trans(src);
 	dst = h_trans(dst);
+	dst.copyTo(src);
 	return dst;
 }
 
-Mat h_trans(Mat src)
+Mat h_trans(Mat& src)
 {
 	Mat dst(src.size(), src.type());
 	int half_rows = src.rows / 2;
@@ -72,10 +77,11 @@ Mat h_trans(Mat src)
 	}
 	Mat imgroi = dst(Rect(0, half_rows, src.cols, half_rows));
 	normalize(imgroi, imgroi, 0, 255, NORM_MINMAX);
+	dst.copyTo(src);
 	return dst;
 }
 
-Mat v_trans(Mat src)
+Mat v_trans(Mat& src)
 {
 	Mat dst(src.size(), src.type());
 	int half_cols = src.cols / 2;
@@ -90,6 +96,7 @@ Mat v_trans(Mat src)
 	}
 	Mat	imgroi = dst(Rect(half_cols, 0, half_cols, src.rows));
 	normalize(imgroi, imgroi, 0, 255, NORM_MINMAX);
+	dst.copyTo(src);
 	return dst;
 }
 
