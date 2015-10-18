@@ -15,7 +15,7 @@ Mat do_filter(Mat &dft_result, Mat filter,Mat &dft_filter_dst);
 Mat draw_the_map(Mat r_dft_result, Mat g_dft_result, Mat b_dft_result, Mat filter, 
 	int type,Point anchor=Point(0,0),string str="str");
 
-int w_pic = int(1920 / 6), h_pic = int(1080 / 6);
+static int w_pic = int(1920 / 6), h_pic = int(1080 / 6);
 Mat dst(h_pic * 3, w_pic * 3, CV_32FC3);
 
 int lpf(string option, string img){
