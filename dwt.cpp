@@ -96,11 +96,3 @@ Mat v_trans(Mat& src)
 	return dst;
 }
 
-
-
-
-
-
-
-
-

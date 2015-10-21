@@ -6,33 +6,53 @@ using namespace std;
 int sztx(string str);
 int lpf(string option, string img);
 int dwt(string img, int time);
+int _smooth(string img, string type);
 
 int _tmain(int argc, _TCHAR* argv[])
 {
 	string img,option;
 	int tmp;
 
-	if (argc>2)
+	switch (argc)
 	{
-		option = argv[2];
+	case 1:
+		img = "template.jpg";
+		option = "-arithmetic";
+		break;
+	case 2:
 		img = argv[1];
+		option = "-arithmetic";
+		break;
+	case 3:
+		img = argv[1];
+		option = argv[2];
+		break;
+	default:
+		break;
 	}
-	else
-	{
-		option = "1";
-		if (argc < 2)
-			img = "template.jpg";
-		else
-			img = argv[1];
-	}
-
-	tmp = dwt(img, atoi(option.c_str()));
+	tmp = _smooth(img, option);
+	//tmp = dwt(img, atoi(option.c_str()));
 	if (tmp!=0)
 	{
 		cout << tmp << endl;
 	}
 	return tmp;
 }
+
+//for dwt
+//if (argc>2)
+//{
+//	option = argv[2];
+//	img = argv[1];
+//}
+//else
+//{
+//	option = "1";
+//	if (argc < 2)
+//		img = "template.jpg";
+//	else
+//		img = argv[1];
+//}
 
 //for low pass filter
 //string option

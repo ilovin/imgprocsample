@@ -106,6 +106,9 @@ void diffcopy(Mat &src, Mat &dst)
 		}
 	}
 	else{
+		//tmp = src.clone();
+		src.convertTo(tmp, CV_32FC3);
+		normalize(tmp, tmp, 0, 1, NORM_MINMAX);
 		src.copyTo(dst);
 	}
 }
@@ -173,7 +176,7 @@ void drawtheblock(Mat &src, Mat &dst, Point anchor, String str)
 	baseline += thickness;
 
 	Mat imgroi;
-	imgroi = dst(Rect(anchor.x,anchor.y, w_pic, h_pic));
+	imgroi = dst(Rect(anchor.x,anchor.y, src.cols, src.rows));
 	Point textOrg = anchor;
 	diffcopy(src, imgroi);
 	textOrg = Point(anchor.x + 10, anchor.y + 10);
