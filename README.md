@@ -9,7 +9,7 @@
 	//即对某图片进行多次小波变换
 ####出口
 对样本图片进行两次小波变换结果：
-![dwt](final_result/dst.png)
+![dwt](final_result/dwt.png)
 ###低通滤波器	`lpf.cpp`
 ####入口:
 - 直接双击会显示`help`函数，声明该程序如何使用
