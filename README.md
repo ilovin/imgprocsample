@@ -1,11 +1,20 @@
 # 使用说明
 
 ###程序说明
+###小波变换`dwt.cpp`
+####入口：
+- 直接双击对文件下的`template.jpg`进行一次小波变换
+- 在cmd中运行，格式为
+	>sztx.exe [img --default template.jpg] [times]</br>
+	//即对某图片进行多次小波变换
+####出口
+对样本图片进行两次小波变换结果：
+![dwt](final_result/dst.png)
 ###低通滤波器	`lpf.cpp`
 ####入口:
 - 直接双击会显示`help`函数，声明该程序如何使用
 - 在cmd中运行，其格式为
->sztx.exe [option][img --default template,jpg]
+	>sztx.exe [option][img --default template,jpg]
 
 ######option共有如下选项：
 

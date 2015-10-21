@@ -20,22 +20,19 @@ int dwt(string img, int time)
 	int w_pic = src.cols, h_pic = src.rows;
 	while (src.rows>1080/2||src.cols>1920/2)
 	{
-		w_pic /= 2;
-		h_pic /= 2;
+		w_pic = w_pic*2/3;
+		h_pic = h_pic*2/3;
 		resize(src, src, Size(w_pic, h_pic));
 	}
-	border_to_even(src);
+	//border_to_even(src);
 	//src.convertTo(src, CV_32F);
 	normalize(src, src, 0, date_num, NORM_MINMAX);
-	//imshow("src", src);
-	//Mat dst = h_trans(src);
-	//Mat dst = v_trans(src);
 	Mat dst = dwt_one_time(src);
-	Mat imgroi = dst(Rect(0, 0, dst.cols / 2, dst.rows / 2));
+	Mat imgroi = dst;
 	for (int i = 0; i < time-1; i++)
 	{
-		dwt_one_time(imgroi);
 		imgroi = imgroi(Rect(0, 0, imgroi.cols / 2, imgroi.rows / 2));
+		dwt_one_time(imgroi);
 	}
 	imshow("dst", dst);
 	while (waitKey(30)!=27)
@@ -74,8 +71,8 @@ Mat h_trans(Mat& src)
 	{
 		dst.row(half_rows + i) -= dst.row(i);
 	}
-	Mat imgroi = dst(Rect(0, half_rows, src.cols, half_rows));
-	normalize(imgroi, imgroi, 0, date_num, NORM_MINMAX);
+	/*Mat imgroi = dst(Rect(0, half_rows, src.cols, half_rows));
+	normalize(imgroi, imgroi, 0, date_num, NORM_MINMAX);*/
 	dst.copyTo(src);
 	return dst;
 }
@@ -93,8 +90,8 @@ Mat v_trans(Mat& src)
 	{
 		dst.col(half_cols + i) -= dst.col(i);
 	}
-	Mat	imgroi = dst(Rect(half_cols, 0, half_cols, src.rows));
-	normalize(imgroi, imgroi, 0, date_num, NORM_MINMAX);
+	/*Mat	imgroi = dst(Rect(half_cols, 0, half_cols, src.rows));
+	normalize(imgroi, imgroi, 0, date_num, NORM_MINMAX);*/
 	dst.copyTo(src);
 	return dst;
 }
