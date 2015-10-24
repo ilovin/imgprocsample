@@ -18,7 +18,7 @@ int _smooth(string img, string type)
 	Mat final_res;
 	w_pic = src.cols;
 	h_pic = src.rows;
-	while (src.rows>1080 / 4 || src.cols>1920 / 4)
+	while (src.rows>1080 / 6 || src.cols>1920 / 6)
 	{
 		w_pic = w_pic * 2 / 3;
 		h_pic = h_pic * 2 / 3;
@@ -29,23 +29,28 @@ int _smooth(string img, string type)
 	//imshow("src", src);
 	Mat dst;
 	Mat polute_PaS,polute_p,polute_s;
-	final_res = Mat(src.rows * 3, src.cols * 2, CV_32FC3);
 	polute_PaS = peper(src, 0.05);
 	polute_PaS = salt(polute_PaS, 0.05);
 	polute_p = peper(src, 0.1);
 	polute_s = salt(src, 0.1);
+
+	int tmp = 3;
+	string str0 = "kernal_size = ",str;
+	char intstr[32];
+	char c=0;
+
+	if (type == "-example" || type == "-e")
+		final_res = Mat(src.rows * 3, src.cols * 4, CV_32FC3);
+	else
+		final_res = Mat(src.rows * 3, src.cols * 2, CV_32FC3);
 	drawtheblock(polute_PaS, final_res, Point(0, 0), "perper & salt");
 	drawtheblock(polute_s, final_res, Point(0, src.rows), "only salt");
 	drawtheblock(polute_p, final_res, Point(0, src.rows*2), "only peper");
 
-	int tmp = 3;
-	string str0 = "kernal_size = ",str;
-	char c=0;
 	if (type=="-arithmetic"||type=="-a")
 	{
 		while (c!=27)
 		{
-			char intstr[32];
 			_itoa_s(tmp, intstr,10);
 			c = waitKey(500);
 			str = str0 + string(intstr);
@@ -70,7 +75,6 @@ int _smooth(string img, string type)
 	}
 	else if (type=="-geometry"||type=="-g")
 	{
-			char intstr[32];
 			_itoa_s(tmp, intstr, 10);
 			str = str0 + string(intstr);
 			drawtheblock(geometry_filter(polute_PaS, tmp), final_res,
@@ -84,9 +88,7 @@ int _smooth(string img, string type)
 			waitKey(0);
 	}
 	else if (type == "-harmonic" || type == "-h"){
-			char intstr[32];
 			_itoa_s(tmp, intstr, 10);
-			c = waitKey(500);
 			str = str0 + string(intstr);
 			drawtheblock(harmonic_filter(polute_PaS, tmp), final_res,
 				Point(src.cols, 0), str);
@@ -99,7 +101,31 @@ int _smooth(string img, string type)
 
 			waitKey(0);
 	}
+	else if (type == "-example" ||type=="-e")
+	{
+			drawtheblock(arith_filter(polute_PaS, tmp), final_res, 
+				Point(src.cols, 0), "arithmetic");
+			drawtheblock(arith_filter(polute_s, tmp), final_res, 
+				Point(src.cols, src.rows), " ");
+			drawtheblock(arith_filter(polute_p, tmp), final_res, 
+				Point(src.cols, src.rows*2), " ");
 
+			drawtheblock(geometry_filter(polute_PaS, tmp), final_res,
+				Point(src.cols*2, 0), "geometry");
+			drawtheblock(geometry_filter(polute_s, tmp), final_res,
+				Point(src.cols*2, src.rows), " ");
+			drawtheblock(geometry_filter(polute_p, tmp), final_res,
+				Point(src.cols*2, src.rows * 2), " ");
+
+			drawtheblock(harmonic_filter(polute_PaS, tmp), final_res,
+				Point(src.cols*3, 0), "harmonic");
+			drawtheblock(harmonic_filter(polute_s, tmp), final_res,
+				Point(src.cols*3, src.rows), " ");
+			drawtheblock(harmonic_filter(polute_p, tmp), final_res,
+				Point(src.cols*3, src.rows * 2), " ");
+		imshow("example", final_res);
+		waitKey(0);
+	}
 	return 0;
 }
 

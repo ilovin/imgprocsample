@@ -179,6 +179,11 @@ void drawtheblock(Mat &src, Mat &dst, Point anchor, String str)
 	imgroi = dst(Rect(anchor.x,anchor.y, src.cols, src.rows));
 	Point textOrg = anchor;
 	diffcopy(src, imgroi);
+	//Scalar color;
+	//color[2] = rand() % 256;
+	//color[1] = rand() % 256;
+	//color[0] = rand() % 256;
+	//color = color / 255;
 	textOrg = Point(anchor.x + 10, anchor.y + 10);
 	putText(dst, text, textOrg, fontFace, fontScale,
 		Scalar::all(255), thickness, 8);
