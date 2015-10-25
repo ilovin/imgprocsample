@@ -1,12 +1,35 @@
 # 使用说明
 
 ###程序说明
+###滤波`smooth.cpp`
+共有三种滤波方式，算术、几何、谐波均值滤波 </br>
+####入口
+- 直接双击程序，对文件夹下`template.jpg`进行处理//在经椒盐噪声后，一次用三种方法滤波
+- 在cmd中运行，格式为
+
+    > sztx.exe [img --default template.jpg] [option] </br>
+  
+  其中`option`选项含义如下:
+
+    -a : 或-arithmetric 算术平均值滤波
+    -g : 或-geometry 几何均值滤波
+    -h : 或-harmonic 谐波均值滤波
+    -e : 或-example 示例程序，三种滤波效果对比
+
+####出口
+- 算术平均滤波，由于运算速度较快，选择按任意键开始每隔对滤波kernal放大进行再次滤波，按空格键暂停，`esc`	退出
+- 几何均值滤波和谐波均值滤波，均有一个关于kernal的track bar用于调整
+- 示例程序的输出结果：</br>
+在原图片分别被，椒盐，盐，椒噪声干扰后进行滤波后的结果
+![smooth](http://i.imgur.com/4u7zHYI.jpg)
+
 ###小波变换`dwt.cpp`
 ####入口：
 - 直接双击对文件下的`template.jpg`进行一次小波变换
 - 在cmd中运行，格式为
 	>sztx.exe [img --default template.jpg] [times]</br>
 	//即对某图片进行多次小波变换
+
 ####出口
 对样本图片进行两次小波变换结果：
 ![dwt](final_result/dwt.png)

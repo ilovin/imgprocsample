@@ -11,11 +11,17 @@ Mat arith_filter(Mat src,int kernal_size);
 Mat geometry_filter(Mat src, int kernal_size);
 Mat harmonic_filter(Mat src, int kernal_size);
 
+static void on_geometryBlur(int, void*);
+static void on_harmonicBlur(int, void*);
+Mat src;
+Mat final_res;
+Mat polute_PaS,polute_p,polute_s;
+int g_geometryBlurValue = 3, g_harmonicBlurValue = 3;
+
 int _smooth(string img, string type)
 {
 	int w_pic, h_pic;
-	Mat src = imread(img);
-	Mat final_res;
+	src = imread(img);
 	w_pic = src.cols;
 	h_pic = src.rows;
 	while (src.rows>1080 / 6 || src.cols>1920 / 6)
@@ -27,8 +33,6 @@ int _smooth(string img, string type)
 	src.convertTo(src, CV_32FC3);
 	src = src / 255;
 	//imshow("src", src);
-	Mat dst;
-	Mat polute_PaS,polute_p,polute_s;
 	polute_PaS = peper(src, 0.05);
 	polute_PaS = salt(polute_PaS, 0.05);
 	polute_p = peper(src, 0.1);
@@ -47,12 +51,15 @@ int _smooth(string img, string type)
 	drawtheblock(polute_s, final_res, Point(0, src.rows), "only salt");
 	drawtheblock(polute_p, final_res, Point(0, src.rows*2), "only peper");
 
+	//Mat media_filter;
+	//medianBlur(polute_PaS, media_filter, 5);
+	//imshow("media", media_filter);
 	if (type=="-arithmetic"||type=="-a")
 	{
 		while (c!=27)
 		{
 			_itoa_s(tmp, intstr,10);
-			c = waitKey(500);
+			c = waitKey(1000);
 			str = str0 + string(intstr);
 			drawtheblock(arith_filter(polute_PaS, tmp), final_res, 
 				Point(src.cols, 0), str);
@@ -66,40 +73,25 @@ int _smooth(string img, string type)
 			if (tmp == 3)
 				waitKey(0);
 			if (c == 32)
-				waitKey(0);
+				c = waitKey(0);
+
 	
 			tmp += 2;
 			if (tmp>src.rows/4||tmp>src.cols/4)
 				break;
 		}
+		return 0;
 	}
 	else if (type=="-geometry"||type=="-g")
 	{
-			_itoa_s(tmp, intstr, 10);
-			str = str0 + string(intstr);
-			drawtheblock(geometry_filter(polute_PaS, tmp), final_res,
-				Point(src.cols, 0), str);
-			drawtheblock(geometry_filter(polute_s, tmp), final_res,
-				Point(src.cols, src.rows), " ");
-			drawtheblock(geometry_filter(polute_p, tmp), final_res,
-				Point(src.cols, src.rows * 2), " ");
-
-			imshow("geometry", final_res);
-			waitKey(0);
+		namedWindow("geometry");
+		createTrackbar("_size", "geometry", &g_geometryBlurValue, 11, on_geometryBlur);
+		on_geometryBlur(g_geometryBlurValue,0);
 	}
 	else if (type == "-harmonic" || type == "-h"){
-			_itoa_s(tmp, intstr, 10);
-			str = str0 + string(intstr);
-			drawtheblock(harmonic_filter(polute_PaS, tmp), final_res,
-				Point(src.cols, 0), str);
-			drawtheblock(harmonic_filter(polute_s, tmp), final_res,
-				Point(src.cols, src.rows), " ");
-			drawtheblock(harmonic_filter(polute_p, tmp), final_res,
-				Point(src.cols, src.rows * 2), " ");
-
-			imshow("harmonic", final_res);
-
-			waitKey(0);
+		namedWindow("harmonic");
+		createTrackbar("size ", "harmonic", &g_harmonicBlurValue, 11, on_harmonicBlur);
+		on_harmonicBlur(g_harmonicBlurValue, 0);//Mat img = *(Mat*)usrdata;
 	}
 	else if (type == "-example" ||type=="-e")
 	{
@@ -124,11 +116,50 @@ int _smooth(string img, string type)
 			drawtheblock(harmonic_filter(polute_p, tmp), final_res,
 				Point(src.cols*3, src.rows * 2), " ");
 		imshow("example", final_res);
-		waitKey(0);
 	}
+	waitKey(0);
 	return 0;
 }
 
+static void on_geometryBlur(int, void*)
+{	
+	char intstr[30];
+	string str, str0;
+	str0 = "kernal_size = ";
+	if (g_geometryBlurValue%2==0)
+	{
+		g_geometryBlurValue += 1;
+	}
+	_itoa_s(g_geometryBlurValue, intstr, 10);
+	str = str0 + string(intstr);
+	drawtheblock(geometry_filter(polute_PaS, g_geometryBlurValue), final_res,
+		Point(src.cols, 0), str);
+	drawtheblock(geometry_filter(polute_s, g_geometryBlurValue), final_res,
+		Point(src.cols, src.rows), " ");
+	drawtheblock(geometry_filter(polute_p, g_geometryBlurValue), final_res,
+		Point(src.cols, src.rows * 2), " ");
+	imshow("geometry", final_res);
+}
+
+static void on_harmonicBlur(int, void*){
+	char intstr[30];
+	string str, str0;
+	str0 = "kernal_size = ";
+	if (g_harmonicBlurValue%2==0)
+	{
+		g_harmonicBlurValue += 1;
+	}
+	_itoa_s(g_harmonicBlurValue, intstr, 10);
+	str = str0 + string(intstr);
+	drawtheblock(harmonic_filter(polute_PaS, g_harmonicBlurValue), final_res,
+		Point(src.cols, 0), str);
+	drawtheblock(harmonic_filter(polute_s, g_harmonicBlurValue), final_res,
+		Point(src.cols, src.rows), " ");
+	drawtheblock(harmonic_filter(polute_p, g_harmonicBlurValue), final_res,
+		Point(src.cols, src.rows * 2), " ");
+
+	imshow("harmonic", final_res);
+}
 Mat arith_filter(Mat src,int kernal_size)
 {
 	Mat kernel = Mat::ones(kernal_size, kernal_size, CV_32F) / (kernal_size*kernal_size);

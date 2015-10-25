@@ -17,11 +17,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 	case 1:
 		img = "template.jpg";
-		option = "-arithmetic";
+		option = "-example";
 		break;
 	case 2:
 		img = argv[1];
-		option = "-arithmetic";
+		option = "-example";
 		break;
 	case 3:
 		img = argv[1];
