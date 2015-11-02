@@ -17,7 +17,11 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 	case 1:
 		img = "template.jpg";
+<<<<<<< fb22dd53c6d28f46a1ad5bd863396819b772e8a9
 		option = "-example";
+=======
+		option = "-arithmetic";
+>>>>>>> Revert "add the lut"
 		break;
 	case 2:
 		img = argv[1];
