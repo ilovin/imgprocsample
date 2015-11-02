@@ -27,7 +27,7 @@ int sztx(string str)
 	{
 		return -1;
 	}
-	imwrite("dst.bmp", src);
+	//imwrite("dst.bmp", src);
 	resize(src, src, Size(w_pic, h_pic));
 	//cout << src.size() << endl;
 	//imshow("src", src);

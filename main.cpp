@@ -7,6 +7,7 @@ int sztx(string str);
 int lpf(string option, string img);
 int dwt(string img, int time);
 int _smooth(string img, string type);
+int lut(string option, string img);
 
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -17,7 +18,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 	case 1:
 		img = "template.jpg";
-		option = "-arithmetic";
+		option = "-inverse";
 		break;
 	case 2:
 		img = argv[1];
@@ -30,7 +31,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	default:
 		break;
 	}
-	tmp = _smooth(img, option);
+	tmp = lut(option,img);
 	//tmp = dwt(img, atoi(option.c_str()));
 	if (tmp!=0)
 	{
@@ -38,6 +39,26 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 	return tmp;
 }
+
+//for smooth:arithmetic geometry harmonic
+//switch (argc)
+//{
+//case 1:
+//	img = "template.jpg";
+//	option = "-arithmetic";
+//	break;
+//case 2:
+//	img = argv[1];
+//	option = "-arithmetic";
+//	break;
+//case 3:
+//	img = argv[1];
+//	option = argv[2];
+//	break;
+//default:
+//	break;
+//}
+//tmp = _smooth(img, option);
 
 //for dwt
 //if (argc>2)
