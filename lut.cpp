@@ -27,18 +27,6 @@ Image::~Image()
 Mat apply(Image& img,int type){
 	int dim(256);
 	Mat lut(1, &dim, CV_8UC(img.dst.channels()));
-	//cout << "dst.channal : " << img.dst.channels() << endl;
-	//switch (type)
-	//{
-	//case 0:
-	//	break;
-	//case 1:
-	//	break;
-	//case 2:
-	//	break;
-	//default:
-	//	break;
-	//}
 	switch (type)
 	{
 	case 0:
@@ -96,6 +84,14 @@ Mat apply(Image& img,int type){
 	return img.dst;
 }
 
+static void help(){
+	cout << "this is an example of lookuptable" << endl
+		<< "input argument" << endl
+		<< "[option][img --default template.jpg" << endl
+		<< "option:" << endl
+		<< "\"-log\",\"-sqrt\",\"-pow\",\"-example or -e\"" << endl;
+}
+
 int lut(string option, string img){
 	int w_pic, h_pic;
 	Mat src = imread(img);
@@ -108,15 +104,37 @@ int lut(string option, string img){
 		resize(src, src, Size(w_pic, h_pic));
 	}
 	double t = (double)getTickCount();
-	Mat fin_res(src.rows*2,src.cols*2,src.type());
-	drawtheblock(src, fin_res, Point(0, 0), "original");
+	Mat fin_res;
 	Image imgi(src);
-	drawtheblock(apply(imgi, 0), fin_res, Point(w_pic, 0), "log");
-	drawtheblock(apply(imgi, 1), fin_res, Point(0, h_pic), "sqrt");
-	drawtheblock(apply(imgi, 2), fin_res, Point(w_pic, h_pic), "pow_0.3");
+	if (option == "-e")
+	{
+		fin_res = Mat(src.rows * 2, src.cols * 2, src.type());
+		drawtheblock(apply(imgi, 0), fin_res, Point(w_pic, 0), "log");
+		drawtheblock(apply(imgi, 1), fin_res, Point(0, h_pic), "sqrt");
+		drawtheblock(apply(imgi, 2), fin_res, Point(w_pic, h_pic), "pow_0.3");
+	}
+	else
+		fin_res = Mat(src.rows, src.cols * 2, src.type());
+
+	drawtheblock(src, fin_res, Point(0, 0), "original");
+	if (option == "-e")
+		NULL;
+	else if (option=="-log")
+		drawtheblock(apply(imgi, 0), fin_res, Point(w_pic, 0), "log");
+	else if (option == "-sqrt")
+		drawtheblock(apply(imgi, 1), fin_res, Point(w_pic, 0), "sqrt");
+	else if (option == "-pow")
+		drawtheblock(apply(imgi, 2), fin_res, Point(w_pic, 0), "pow_0.3");
+	else if (option == "-h")
+		help();
+	else{
+		cout << "invalid input , try again" << endl;
+		help();
+	}
+	
+
 	t = ((double)getTickCount() - t) / getTickFrequency();
-	cout << "total time:" << t << endl;
-	//cout << apply(imgi,0) << endl;
+	cout << "total time:" << t * 1000 << "ms" << endl;
 	imshow("dst", fin_res);
 	waitKey(0);
 	return 0;

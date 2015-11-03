@@ -17,16 +17,16 @@ int _tmain(int argc, _TCHAR* argv[])
 	switch (argc)
 	{
 	case 1:
-		img = "template.jpg";
-		option = "-inverse";
+		img = "black.png";
+		option = "-e";
 		break;
 	case 2:
-		img = argv[1];
-		option = "-inverse";
+		img = "black.png";
+		option = argv[1];
 		break;
 	case 3:
-		img = argv[1];
-		option = argv[2];
+		img = argv[2];
+		option = argv[1];
 		break;
 	default:
 		break;

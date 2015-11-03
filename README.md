@@ -1,6 +1,18 @@
 # 使用说明
 
 ###程序说明
+###查找表`lut.cpp`
+####入口
+- 直接双击程序，对文件夹下`black.png`进行处理
+- CMD中运行格式为
+    > sztx.exe [option][img --default template.jpg]
+
+其中 `option`:
+"-log","-sqrt","-pow"(默认为0.3的指数）,"-example or -e"(缺省值)
+####出口
+在`example`状态下，包含了其他三种情况,对数，平方根，指数；
+![black](final_result/black.png)
+
 ###滤波`smooth.cpp`
 共有三种滤波方式，算术、几何、谐波均值滤波 </br>
 ####入口
