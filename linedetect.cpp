@@ -31,13 +31,14 @@ int linedetect(string option, string img){
 	if (src.empty())
 		return -1;
 	resizeToscreen(src, Size(1920 / 2, 1080 / 2));
-	Mat kernal = getStructuringElement(MORPH_RECT,Size(5,5),Point(2,2));
+	Mat kernal = getStructuringElement(MORPH_RECT,Size(7,7),Point(3,3));
+	src = src(Rect(0, src.rows/4, src.cols, src.rows/4*3));
 	GaussianBlur(src, src, Size(5, 5), 2, 2);
-	morphologyEx(src, src, MORPH_CLOSE, kernal);
+	morphologyEx(src, src, MORPH_OPEN, kernal);
 	Image pic = Image(src);
 	vector<Vec4i> lines;
 	HoughLinesP(pic.getCanny(), lines, 1, CV_PI / 180, 80,
-		min(src.rows, src.cols) / 2, min(src.rows, src.cols) / 5);
+		min(src.rows, src.cols) / 2, min(src.rows, src.cols) / 10);
 	for (int i = 0; i < lines.size(); i++)
 	{
 		Scalar color;
