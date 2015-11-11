@@ -11,3 +11,16 @@ Mat histgram(Mat &src);
 extern Mat histgram3c(Mat &src,Size output_size);
 Mat equalize3c(Mat &src);
 void resizeToscreen(Mat& src, Size s);
+
+class Image
+{
+public:
+	Image(Mat &img);
+	~Image();
+	Mat getCanny();
+	Mat canny;
+
+private:
+	Mat src;
+	Mat gray;
+};

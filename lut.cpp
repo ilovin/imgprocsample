@@ -2,17 +2,18 @@
 #include "stdafx.h"
 #include "sztx.h"
 
-class Image
-{
-public:
-	Image(Mat a);
-	~Image();
-	Mat original;
-	Mat dst;
+namespace lut{
 
-private:
+	class Image
+	{
+	public:
+		Image(Mat a);
+		~Image();
+		Mat original;
+		Mat dst;
 
-};
+	private:
+	};
 
 Image::Image(Mat a)
 {
@@ -206,4 +207,6 @@ int lut(string option, string img){
 	imshow("graytoColor", g2c);
 	waitKey(0);
 	return 0;
+}
+
 }

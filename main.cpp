@@ -9,15 +9,15 @@ int dwt(string img, int time);
 int _smooth(string img, string type);
 int lut(string option, string img);
 int jpeg(string option, string img);
+int linedetect(string option, string img);
 
 int _tmain(int argc, _TCHAR* argv[])
 {
 	string img,option;
 	int tmp;
-
-	img = argc > 2 ? argv[2] : "template.bmp";
-	option = argc > 1 ? argv[1] : "-o";
-	tmp = jpeg(option, img);
+	img = argc > 2 ? argv[2] : "template.jpg";
+	option = argc > 1 ? argv[1] : "-e";
+	tmp = linedetect(option, img);
 	if (tmp!=0)
 	{
 		cout << tmp << endl;
