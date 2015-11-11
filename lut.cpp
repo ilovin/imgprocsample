@@ -84,6 +84,69 @@ Mat apply(Image& img,int type){
 	return img.dst;
 }
 
+Mat gray2Color(Mat& gray,bool method=true,int seg = 16){
+	if (gray.channels()!=1)
+	{
+		cout << "gray2Color error,this is not a gray pic" << endl;
+		return gray;
+	}
+	if (gray.type()==CV_32FC1)
+		gray.convertTo(gray, CV_8UC1, 255);
+	Mat dst(gray.size(), CV_8UC3);
+	if (method)
+	{
+		for (int i = 0; i < gray.rows; i++)
+		{
+			for (int j = 0; j < gray.cols; j++)
+			{
+				int tmp = gray.at<uchar>(i, j);
+				if (tmp<64)
+				{
+					dst.at<Vec3b>(i, j)[0] = 255;
+					dst.at<Vec3b>(i, j)[1] = 4*tmp;
+					dst.at<Vec3b>(i, j)[2] = 0;
+
+				}
+				else if (tmp<128)
+				{
+					dst.at<Vec3b>(i, j)[0] = 511-4*tmp;
+					dst.at<Vec3b>(i, j)[1] = 255;
+					dst.at<Vec3b>(i, j)[2] = 0;
+				}
+				else if (tmp<192)
+				{
+					dst.at<Vec3b>(i, j)[0] = 0;
+					dst.at<Vec3b>(i, j)[1] = 255;
+					dst.at<Vec3b>(i, j)[2] = 4*tmp-511;
+				}
+				else
+				{
+					dst.at<Vec3b>(i, j)[0] = 0;
+					dst.at<Vec3b>(i, j)[1] = 1023-4*tmp;
+					dst.at<Vec3b>(i, j)[2] = 255;
+				}
+			}
+		}
+	}
+	else
+	{
+		int ser = 256 / seg;
+		for (int i = 0; i < gray.rows; i++)
+		{
+			for (int j = 0; j < gray.cols; j++)
+			{
+				int tmp = gray.at<uchar>(i, j) / ser;
+				dst.at<Vec3b>(i, j)[0] = tmp*ser;
+				dst.at<Vec3b>(i, j)[1] = (seg-1-tmp)*ser;
+				dst.at<Vec3b>(i, j)[2] = 0;
+			}
+		}
+
+	}
+
+	return dst;
+}
+
 static void help(){
 	cout << "this is an example of lookuptable" << endl
 		<< "input argument" << endl
@@ -93,16 +156,17 @@ static void help(){
 }
 
 int lut(string option, string img){
-	int w_pic, h_pic;
 	Mat src = imread(img);
+	if (src.empty())
+	{
+		cout << "cannot open the pic" << endl;
+		return -1;
+	}
+	resizeToscreen(src, Size(1920 / 4, 1080 / 4));
+	int w_pic, h_pic;
 	w_pic = src.cols;
 	h_pic = src.rows;
-	while (src.rows>1080 / 3 || src.cols>1920 / 3)
-	{
-		w_pic = w_pic * 2 / 3;
-		h_pic = h_pic * 2 / 3;
-		resize(src, src, Size(w_pic, h_pic));
-	}
+
 	double t = (double)getTickCount();
 	Mat fin_res;
 	Image imgi(src);
@@ -136,6 +200,10 @@ int lut(string option, string img){
 	t = ((double)getTickCount() - t) / getTickFrequency();
 	cout << "total time:" << t * 1000 << "ms" << endl;
 	imshow("dst", fin_res);
+	Mat gray;
+	cvtColor(apply(imgi, 1), gray, CV_RGB2GRAY);
+	Mat g2c = gray2Color(gray,true,8);
+	imshow("graytoColor", g2c);
 	waitKey(0);
 	return 0;
 }

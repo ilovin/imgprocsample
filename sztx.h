@@ -10,3 +10,4 @@ void rgb2cmyk2(Mat &src, Mat &cmyk);
 Mat histgram(Mat &src);
 extern Mat histgram3c(Mat &src,Size output_size);
 Mat equalize3c(Mat &src);
+void resizeToscreen(Mat& src, Size s);

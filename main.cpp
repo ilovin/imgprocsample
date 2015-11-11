@@ -8,37 +8,27 @@ int lpf(string option, string img);
 int dwt(string img, int time);
 int _smooth(string img, string type);
 int lut(string option, string img);
+int jpeg(string option, string img);
 
 int _tmain(int argc, _TCHAR* argv[])
 {
 	string img,option;
 	int tmp;
 
-	switch (argc)
-	{
-	case 1:
-		img = "black.png";
-		option = "-e";
-		break;
-	case 2:
-		img = "black.png";
-		option = argv[1];
-		break;
-	case 3:
-		img = argv[2];
-		option = argv[1];
-		break;
-	default:
-		break;
-	}
-	tmp = lut(option,img);
-	//tmp = dwt(img, atoi(option.c_str()));
+	img = argc > 2 ? argv[2] : "template.jpg";
+	option = argc > 1 ? argv[1] : "-e";
+	tmp = jpeg(option, img);
 	if (tmp!=0)
 	{
 		cout << tmp << endl;
 	}
 	return tmp;
 }
+
+//for lut
+//img = argc > 2 ? argv[2] : "black.png";
+//option = argc > 1 ? argv[1] : "-e";
+
 
 //for dwt
 //if (argc>2)

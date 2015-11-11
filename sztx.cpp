@@ -68,6 +68,17 @@ int sztx(string str)
 	return 0;
 }
 
+void resizeToscreen(Mat& src, Size s)
+{
+	int w_pic = src.cols;
+	int h_pic = src.rows;
+	while (src.rows>s.height || src.cols>s.width)
+	{
+		w_pic = w_pic * 2 / 3;
+		h_pic = h_pic * 2 / 3;
+		resize(src, src, Size(w_pic, h_pic));
+	}
+}
 
 void diffcopy(Mat &src, Mat &dst)
 {
