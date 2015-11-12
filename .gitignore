@@ -30,7 +30,8 @@
 # others
 *.jpg
 Debug/
-dst.bmp
+*.bmp
+*.png
 stdafx.cpp
 sztx.vcxproj
 sztx.vcxproj.filters

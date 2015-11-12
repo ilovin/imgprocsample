@@ -15,8 +15,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	string img,option;
 	int tmp;
 
-	img = argc > 2 ? argv[2] : "template.jpg";
-	option = argc > 1 ? argv[1] : "-e";
+	img = argc > 2 ? argv[2] : "template.bmp";
+	option = argc > 1 ? argv[1] : "-o";
 	tmp = jpeg(option, img);
 	if (tmp!=0)
 	{

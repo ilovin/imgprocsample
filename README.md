@@ -1,6 +1,23 @@
 # 使用说明
 
 ###程序说明
+###jpeg压缩`jpeg.cpp`
+####程序说明：
+读取一个bmp，转换成一个jpg，利用里libjpeg库
+####入口
+- 直接双击程序，对文件夹下`template.bmp`进行图片压缩
+- sztx.exe [option][img --default template.bmp]
+
+随后要求输入一个有关图形质量的参数，在0-100之间</br>
+其中`option`	选项
+
+	-opencv or -o:以Mat的方式读取数据，并对JSAMPLE类型赋值
+	-e :示例程序，默认以Mat方式读取图像，图形质量为60
+	-f or -*:其他option均使用File的方式读取一个bmp
+####出口
+最终会显示，压缩前后，文件大小对比：
+![jpeg](http://i.imgur.com/L7Cq7Q3.png)
+
 ###查找表`lut.cpp`
 ####入口
 - 直接双击程序，对文件夹下`black.png`进行处理
