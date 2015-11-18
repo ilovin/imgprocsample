@@ -18,7 +18,10 @@ public:
 	Image(Mat &img);
 	~Image();
 	Mat getCanny();
+	Mat getGray();
+	Mat getbinaryCanny();
 	Mat canny;
+	Mat binary;
 
 private:
 	Mat src;
